@@ -241,26 +241,10 @@ function passEl(){ return document.getElementById("password"); }
 
 // NAV
 function show(id) {
-    ["leaderboard","players","scores","clubSelector"].forEach(x=>{
+    ["leaderboard","scores","clubSelector"].forEach(x=>{
         document.getElementById(x).style.display="none";
     });
     document.getElementById(id).style.display="block";
-}
-
-// PLAYERS
-function addPlayer() {
-    const name = document.getElementById("playerName").value;
-    if (!name) return;
-
-    db.run("INSERT INTO players (name,user) VALUES (?,?)",[name,currentUser]);
-    saveDB();
-    refresh();
-}
-
-function removePlayer(name) {
-    db.run("DELETE FROM players WHERE name=? AND user=?",[name,currentUser]);
-    saveDB();
-    refresh();
 }
 
 // SCORES
