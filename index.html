@@ -288,8 +288,6 @@ function pickClub() {
 function refresh() {
 
     const players = db.exec(`SELECT name FROM players WHERE user='${currentUser}'`);
-    const list = document.getElementById("playerList");
-    list.innerHTML="";
 
     if(players.length){
         players[0].values.forEach(p=>{
