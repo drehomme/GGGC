@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -48,6 +49,7 @@ nav button:hover {
     padding:15px;
     margin-bottom:15px;
     border-radius:10px;
+    text-align:center;
 }
 
 input, button {
@@ -69,7 +71,15 @@ td, th {
     padding:10px;
     border-bottom:1px solid #334155;
 }
+
+/* Club selector image */
+#clubImage {
+    margin-top:20px;
+    max-width:250px;
+    border-radius:10px;
+}
 </style>
+
 </head>
 
 <body>
@@ -77,6 +87,7 @@ td, th {
 <header>⛳ Grovner Garage Golf Club (G.G.G.C.)</header>
 
 <!-- AUTH -->
+
 <div id="auth" class="container">
 <div class="card">
 <h2>Login / Sign Up</h2>
@@ -94,24 +105,28 @@ td, th {
 </div>
 
 <!-- APP -->
+
 <div id="app" style="display:none;">
 
 <nav>
 <button onclick="show('leaderboard')">Leaderboard</button>
 <button onclick="show('players')">Players</button>
 <button onclick="show('scores')">Scores</button>
+<button onclick="show('clubSelector')">Club Selector</button>
 <button onclick="logout()">Logout</button>
 </nav>
 
 <div class="container">
 
 <!-- Leaderboard -->
+
 <div id="leaderboard" class="card">
 <h2>Leaderboard</h2>
 <table id="leaderTable"></table>
 </div>
 
 <!-- Players -->
+
 <div id="players" class="card" style="display:none">
 <h2>Players</h2>
 
@@ -122,12 +137,24 @@ td, th {
 </div>
 
 <!-- Scores -->
+
 <div id="scores" class="card" style="display:none">
 <h2>Add Score</h2>
 
 <input id="scorePlayer" placeholder="Player Name">
 <input id="scoreValue" type="number" placeholder="Score">
 <button class="primary" onclick="addScore()">Add Score</button>
+</div>
+
+<!-- CLUB SELECTOR -->
+
+<div id="clubSelector" class="card" style="display:none">
+<h2>🏌️ Club Selector</h2>
+
+<button class="primary" onclick="pickClub()">Pick Random Club</button>
+
+<h3 id="clubResult"></h3>
+<img id="clubImage" src="" style="display:none;">
 </div>
 
 </div>
@@ -154,7 +181,6 @@ initSqlJs({
         saveDB();
     }
 
-    // Auto login
     const savedUser = localStorage.getItem("currentUser");
     if (savedUser) {
         currentUser = savedUser;
@@ -226,7 +252,7 @@ function passEl(){ return document.getElementById("password"); }
 
 // NAV
 function show(id) {
-    ["leaderboard","players","scores"].forEach(x=>{
+    ["leaderboard","players","scores","clubSelector"].forEach(x=>{
         document.getElementById(x).style.display="none";
     });
     document.getElementById(id).style.display="block";
@@ -258,10 +284,32 @@ function addScore() {
     refresh();
 }
 
+// CLUB SELECTOR
+const clubs = [
+    { name:"Driver", img:"https://upload.wikimedia.org/wikipedia/commons/0/0b/Golf_driver.jpg" },
+    { name:"3 Wood", img:"https://upload.wikimedia.org/wikipedia/commons/6/6f/Golf_fairway_wood.jpg" },
+    { name:"5 Iron", img:"https://upload.wikimedia.org/wikipedia/commons/2/2c/Golf_iron.jpg" },
+    { name:"7 Iron", img:"https://upload.wikimedia.org/wikipedia/commons/2/2c/Golf_iron.jpg" },
+    { name:"9 Iron", img:"https://upload.wikimedia.org/wikipedia/commons/2/2c/Golf_iron.jpg" },
+    { name:"Pitching Wedge", img:"https://upload.wikimedia.org/wikipedia/commons/3/3d/Golf_wedge.jpg" },
+    { name:"Sand Wedge", img:"https://upload.wikimedia.org/wikipedia/commons/3/3d/Golf_wedge.jpg" },
+    { name:"Lob Wedge", img:"https://upload.wikimedia.org/wikipedia/commons/3/3d/Golf_wedge.jpg" }
+];
+
+function pickClub() {
+    const randomIndex = Math.floor(Math.random() * clubs.length);
+    const club = clubs[randomIndex];
+
+    document.getElementById("clubResult").innerText = club.name;
+
+    const img = document.getElementById("clubImage");
+    img.src = club.img;
+    img.style.display = "block";
+}
+
 // REFRESH UI
 function refresh() {
 
-    // Players
     const players = db.exec(`SELECT name FROM players WHERE user='${currentUser}'`);
     const list = document.getElementById("playerList");
     list.innerHTML="";
@@ -273,7 +321,6 @@ function refresh() {
         });
     }
 
-    // Leaderboard
     const result = db.exec(`
         SELECT player, AVG(score) 
         FROM scores 
